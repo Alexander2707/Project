@@ -1,7 +1,18 @@
 from pygame import*
 from button import Button
+import time as t
 
 init()
+
+class Player():
+    def __init__(self, x, y, width, height, im):
+        self.image = transform.scale(image.load(im), (self.w, self.h))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def reset(self):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
 screen = display.set_mode((0,0), FULLSCREEN)
 w,h = screen.get_size()
@@ -18,6 +29,10 @@ mixer.music.load("sounds/menu.wav")
 mixer.music.set_volume(0.4)
 mixer.music.play(-1)
 
+clock = time.Clock()
+speed = 1.25
+x1 = 0
+x2 = w
 music = "on"
 a = "menu"
 run = True
@@ -33,6 +48,7 @@ while run:
                 if start_btn.rect.collidepoint(e.pos):
                     start_btn.check_click(mouse.get_pos(), e)
                     a = "lvl1"
+                    start = t.time()
                 if quit_btn.rect.collidepoint(e.pos):
                     quit_btn.check_click(mouse.get_pos(), e)
                     run = False
@@ -60,10 +76,30 @@ while run:
         help_btn.reset()
         mus_btn.reset()
     elif a == "lvl1":
-        screen.blit(lvl1_bg, (0, 0))
+        
+        screen.blit(lvl1_bg, (x1, 0))
+        screen.blit(lvl1_bg, (x2, 0))
+
+        x1 -= speed
+        x2 -= speed
+
+        if x1 <= -w:
+            x1 = w
+
+        if x2 <= -w:
+            x2 = w
+
         for e in event.get():
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     run = False
                     quit()
+        end = t.time()
+        timer = int(end-start)
+        print(timer)
+
+        if timer >= 20:
+            speed = 0
+
+    # clock.tick(90)
     display.update()
