@@ -5,6 +5,9 @@ import random
 
 init()
 
+YELLOW = (247, 244, 47)
+GREY = (104, 100, 97)
+
 bullets = sprite.Group()
 enemies = sprite.Group()
 
@@ -21,7 +24,23 @@ class GameSprite(sprite.Sprite):
 
     def reset(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
+        
+    # def click(self):
+    #     self.click = True
+        
+    def reset2(self):
     
+        # if self.click:
+        #     draw.rect(screen, YELLOW, self.rect, 5)
+        draw.rect(screen, GREY, self.rect)
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+            
+    def reset3(self):
+        draw.rect(screen, GREY, self.rect)
+        draw.rect(screen, YELLOW, self.rect, 5)
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        
+click = False
 class Player(GameSprite):
     def update(self):
         if win == False:
@@ -47,6 +66,12 @@ class Enemy(GameSprite):
         self.rect.x -= self.speed
         if self.rect.x < 0:
             self.kill()
+
+# class Skin(GameSprite):       
+#     def update(self):
+#         draw.rect(screen, GREY, self.rect)
+
+            
     
 screen = display.set_mode((0,0), FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
@@ -57,9 +82,11 @@ quit_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+60), 200, 100, "images/exit.p
 lvl_btn = Button(20, 20, 200, 75, "images/red_but.png", "sounds/click.wav", "LEVELS", "")
 help_btn = Button(WIDTH-220, 20, 200, 75, "images/blue_but.png", "sounds/click.wav", "HELP", "")
 mus_btn = Button(WIDTH-100, HEIGHT-100, 75, 75, "images/musb.png", "sounds/click.wav", "", "images/musb2.png")
+skins_btn = Button(20, HEIGHT-95, 200, 75, "images/blue_but.png", "sounds/click.wav", "SKINS", "")
 
 player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
-# enemy = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 200, 200, "images/enemy.png")
+
+skin1 = GameSprite(50, HEIGHT/2-150, 200, 200, "images/hero.png", 0)
 
 mixer.init()
 mixer.music.load("sounds/menu.wav")
@@ -80,49 +107,64 @@ x2 = WIDTH
 music = "on"
 a = "menu"
 run = True
-while run:
+while run:   
+    for e in event.get():
+        if e.type == KEYDOWN:
+            if e.key == K_ESCAPE:
+                run = False
+            if e.key == K_SPACE:
+                    player.fire()
+        elif e.type == MOUSEBUTTONDOWN:
+            if start_btn.rect.collidepoint(e.pos):
+                start_btn.check_click(mouse.get_pos(), e)
+                a = "lvl1"
+                start = t.time()
+            if quit_btn.rect.collidepoint(e.pos):
+                quit_btn.check_click(mouse.get_pos(), e)
+                run = False
+            if lvl_btn.rect.collidepoint(e.pos):
+                lvl_btn.check_click(mouse.get_pos(), e)
+            if help_btn.rect.collidepoint(e.pos):
+                help_btn.check_click(mouse.get_pos(), e)
+            if skins_btn.rect.collidepoint(e.pos):
+                skins_btn.check_click(mouse.get_pos(), e)
+                a = "skins"
+            if mus_btn.rect.collidepoint(e.pos):
+                mus_btn.check_click(mouse.get_pos(), e)
+                if music == "on":
+                    mixer.music.pause()
+                    music = "off"
+                else:
+                    mixer.music.unpause()
+                    music = "on"
+            if skin1.rect.collidepoint(e.pos):
+                click = True
+                # skin1.click = False
+                # skin1.click()
+                        
     if a == "menu":
         screen.blit(menu_bg, (0, 0))
-        for e in event.get():
-            if e.type == KEYDOWN:
-                if e.key == K_ESCAPE:
-                    run = False
-            elif e.type == MOUSEBUTTONDOWN:
-                if start_btn.rect.collidepoint(e.pos):
-                    start_btn.check_click(mouse.get_pos(), e)
-                    a = "lvl1"
-                    start = t.time()
-                if quit_btn.rect.collidepoint(e.pos):
-                    quit_btn.check_click(mouse.get_pos(), e)
-                    run = False
-                if lvl_btn.rect.collidepoint(e.pos):
-                    lvl_btn.check_click(mouse.get_pos(), e)
-                if help_btn.rect.collidepoint(e.pos):
-                    help_btn.check_click(mouse.get_pos(), e)
-                if mus_btn.rect.collidepoint(e.pos):
-                    mus_btn.check_click(mouse.get_pos(), e)
-                    if music == "on":
-                        mixer.music.pause()
-                        music = "off"
-                    else:
-                        mixer.music.unpause()
-                        music = "on"
-        
         start_btn.draw(screen)
         quit_btn.draw(screen)
         lvl_btn.draw(screen)
         help_btn.draw(screen)
         mus_btn.draw(screen)
+        skins_btn.draw(screen)
         quit_btn.reset()
         start_btn.reset()
         lvl_btn.reset()
         help_btn.reset()
         mus_btn.reset()
+    elif a == "skins":
+        screen.blit(menu_bg, (0, 0))
+        if click == False:
+            skin1.reset2()
+        elif click == True:
+            skin1.reset3()
     elif a == "lvl1":
         
         screen.blit(lvl1_bg, (x1, 0))
         screen.blit(lvl1_bg, (x2, 0))
-        
         
         x1 -= bg_speed
         x2 -= bg_speed
@@ -132,14 +174,6 @@ while run:
 
         if x2 <= -WIDTH:
             x2 = WIDTH
-
-        for e in event.get():
-            if e.type == KEYDOWN:
-                if e.key == K_ESCAPE:
-                    run = False
-                    quit()
-                if e.key == K_SPACE:
-                    player.fire()
         
         end = t.time()
         timer = int(end-start)
