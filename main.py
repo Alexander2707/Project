@@ -1,38 +1,82 @@
 from pygame import*
 from button import Button
 import time as t
+import random
 
 init()
 
-class Player():
-    def __init__(self, x, y, width, height, im):
+bullets = sprite.Group()
+enemies = sprite.Group()
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, x, y, width, height, im, speed = 3):
+        super().__init__()
+        self.w = width
+        self.h = height
         self.image = transform.scale(image.load(im), (self.w, self.h))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.speed = speed
 
     def reset(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
+    
+class Player(GameSprite):
+    def update(self):
+        if win == False:
+            keys = key.get_pressed()
+            if keys[K_UP] and self.rect.top > 0:
+                self.rect.y -= self.speed
+            if keys[K_DOWN] and self.rect.bottom < HEIGHT:
+                self.rect.y += self.speed
+    
+    def fire(self):
+        if win == False:
+            bullet = Bullet(self.rect.right, self.rect.centery, 50, 50, "images/bullet.webp", 10)
+            bullets.add(bullet)
 
+class Bullet(GameSprite):
+    def update(self):
+        self.rect.x += self.speed
+        if self.rect.x > WIDTH:
+            self.kill()
+
+class Enemy(GameSprite):
+    def update(self):
+        self.rect.x -= self.speed
+        if self.rect.x < 0:
+            self.kill()
+    
 screen = display.set_mode((0,0), FULLSCREEN)
-w,h = screen.get_size()
-lvl1_bg = transform.scale(image.load("images/game_bg.jpg"), (w,h))
-menu_bg = transform.scale(image.load("images/menu_bg.png"), (w,h))
-start_btn = Button((w/2-200/2), (h/2-100/2-60), 200, 100, "images/start.png", "sounds/click.wav", "", "images/start2.png")
-quit_btn = Button((w/2-200/2), (h/2-100/2+60), 200, 100, "images/exit.png", "sounds/click.wav", "", "images/exit2.png")
+WIDTH, HEIGHT = screen.get_size()
+lvl1_bg = transform.scale(image.load("images/game_bg.jpg"), (WIDTH, HEIGHT))
+menu_bg = transform.scale(image.load("images/menu_bg.png"), (WIDTH, HEIGHT))
+start_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2-60), 200, 100, "images/start.png", "sounds/click.wav", "", "images/start2.png")
+quit_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+60), 200, 100, "images/exit.png", "sounds/click.wav", "", "images/exit2.png")
 lvl_btn = Button(20, 20, 200, 75, "images/red_but.png", "sounds/click.wav", "LEVELS", "")
-help_btn = Button(w-220, 20, 200, 75, "images/blue_but.png", "sounds/click.wav", "HELP", "")
-mus_btn = Button(w-100, h-100, 75, 75, "images/musb.png", "sounds/click.wav", "", "images/musb2.png")
+help_btn = Button(WIDTH-220, 20, 200, 75, "images/blue_but.png", "sounds/click.wav", "HELP", "")
+mus_btn = Button(WIDTH-100, HEIGHT-100, 75, 75, "images/musb.png", "sounds/click.wav", "", "images/musb2.png")
+
+player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
+# enemy = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 200, 200, "images/enemy.png")
 
 mixer.init()
 mixer.music.load("sounds/menu.wav")
 mixer.music.set_volume(0.4)
 mixer.music.play(-1)
+hit = mixer.Sound('sounds/damage2.mp3')
 
+scroll = True
+enemy_spawn_timer = 0
+next_spawn = random.randint(1000, 1500)
+win = False
+move_up = False
+move_down = False
 clock = time.Clock()
-speed = 1.25
+bg_speed = 1.5
 x1 = 0
-x2 = w
+x2 = WIDTH
 music = "on"
 a = "menu"
 run = True
@@ -43,7 +87,6 @@ while run:
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     run = False
-                    quit()
             elif e.type == MOUSEBUTTONDOWN:
                 if start_btn.rect.collidepoint(e.pos):
                     start_btn.check_click(mouse.get_pos(), e)
@@ -79,27 +122,56 @@ while run:
         
         screen.blit(lvl1_bg, (x1, 0))
         screen.blit(lvl1_bg, (x2, 0))
+        
+        
+        x1 -= bg_speed
+        x2 -= bg_speed
 
-        x1 -= speed
-        x2 -= speed
+        if x1 <= -WIDTH:
+            x1 = WIDTH
 
-        if x1 <= -w:
-            x1 = w
-
-        if x2 <= -w:
-            x2 = w
+        if x2 <= -WIDTH:
+            x2 = WIDTH
 
         for e in event.get():
             if e.type == KEYDOWN:
                 if e.key == K_ESCAPE:
                     run = False
                     quit()
+                if e.key == K_SPACE:
+                    player.fire()
+        
         end = t.time()
         timer = int(end-start)
-        print(timer)
 
         if timer >= 20:
-            speed = 0
-
-    # clock.tick(90)
+            bg_speed = 0
+            win = True
+            scroll = False
+            
+            enemies.empty()
+            
+            if player.rect.x < WIDTH:
+                player.rect.x += player.speed 
+            else:
+                run = False
+            
+        enemy_spawn_timer += clock.get_time()
+        if scroll and enemy_spawn_timer >= next_spawn:
+            enemy_spawn_timer = 0
+            next_spawn = random.randint(1000, 1500)
+            enemy = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/enemy.png")
+            enemies.add(enemy)
+        
+        player.reset()
+        player.update()
+        bullets.draw(screen)
+        bullets.update()
+        enemies.draw(screen)
+        enemies.update()
+        
+        if sprite.groupcollide(bullets, enemies, True, True):
+            hit.play()
+            
+    clock.tick(90)
     display.update()
