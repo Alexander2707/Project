@@ -10,6 +10,7 @@ GREY = (104, 100, 97)
 
 bullets = sprite.Group()
 enemies = sprite.Group()
+coins = sprite.Group()
 
 class GameSprite(sprite.Sprite):
     def __init__(self, x, y, width, height, im, speed = 3):
@@ -72,6 +73,7 @@ class Skin():
         self.click = click
         
     def reset1(self):
+
         draw.rect(screen, GREY, self.rect)
         screen.blit(self.image, (self.rect.x, self.rect.y))
             
@@ -92,10 +94,11 @@ lvl_btn = Button(20, 20, 200, 75, "images/red_but.png", "sounds/click.wav", "LEV
 help_btn = Button(WIDTH-220, 20, 200, 75, "images/blue_but.png", "sounds/click.wav", "HELP", "")
 mus_btn = Button(WIDTH-100, HEIGHT-100, 75, 75, "images/musb.png", "sounds/click.wav", "", "images/musb2.png")
 skins_btn = Button(20, HEIGHT-95, 200, 75, "images/blue_but.png", "sounds/click.wav", "SKINS", "")
+menu_btn = Button(WIDTH-220, 20, 200, 75, "images/blue_but.png", "sounds/click.wav", "MENU", "")
 
-player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
+player = Player(50, HEIGHT/2-150, 200, 200, "images/player.png", 5)
 
-skin1 = Skin(50, HEIGHT/2-150, 200, 200, "images/player.png")
+skin1 = Skin(50, HEIGHT/2-150, 200, 200, "images/player.png", True)
 skin2 = Skin(300, HEIGHT/2-150, 200, 200, "images/hero.png")
 skin3 = Skin(550, HEIGHT/2-150, 200, 200, "images/skin2.png")
 skin4 = Skin(800, HEIGHT/2-150, 200, 200, "images/skin3.png")
@@ -106,14 +109,19 @@ mixer.music.set_volume(0.4)
 mixer.music.play(-1)
 hit = mixer.Sound('sounds/damage2.mp3')
 
+skins = []
+score = 0
 scroll = True
+coin_spawn_timer = 0
 enemy_spawn_timer = 0
+next_coin_spawn = random.randint(3000, 5000)
 next_spawn = random.randint(1000, 1500)
 win = False
+lose = False
 move_up = False
 move_down = False
 clock = time.Clock()
-bg_speed = 1.5
+bg_speed = 2
 x1 = 0
 x2 = WIDTH
 music = "on"
@@ -138,6 +146,9 @@ while run:
                 lvl_btn.check_click(mouse.get_pos(), e)
             if help_btn.rect.collidepoint(e.pos):
                 help_btn.check_click(mouse.get_pos(), e)
+            if menu_btn.rect.collidepoint(e.pos):
+                menu_btn.check_click(mouse.get_pos(), e)
+                a = "menu"
             if skins_btn.rect.collidepoint(e.pos):
                 skins_btn.check_click(mouse.get_pos(), e)
                 a = "skins"
@@ -150,13 +161,37 @@ while run:
                     mixer.music.unpause()
                     music = "on"
             if skin1.rect.collidepoint(e.pos):
+                skins.clear()
+                skins.append(skin1)
                 skin1.click = True
+                skin2.click = False
+                skin3.click = False
+                skin4.click = False
+                player = Player(50, HEIGHT/2-150, 200, 200, "images/player.png", 5)
             if skin2.rect.collidepoint(e.pos):
+                skins.clear()
+                skins.append(skin1)
                 skin2.click = True
+                skin1.click = False
+                skin3.click = False
+                skin4.click = False
+                player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
             if skin3.rect.collidepoint(e.pos):
+                skins.clear()
+                skins.append(skin3)
                 skin3.click = True
+                skin2.click = False
+                skin1.click = False
+                skin4.click = False
+                player = Player(50, HEIGHT/2-150, 200, 200, "images/skin2.png", 5)
             if skin4.rect.collidepoint(e.pos):
+                skins.clear()
+                skins.append(skin4)
                 skin4.click = True
+                skin2.click = False
+                skin3.click = False
+                skin1.click = False
+                player = Player(50, HEIGHT/2-150, 200, 200, "images/skin3.png", 5)
 
     if a == "menu":
         screen.blit(menu_bg, (0, 0))
@@ -173,79 +208,85 @@ while run:
         mus_btn.reset()
     elif a == "skins":
         screen.blit(menu_bg, (0, 0))
+        menu_btn.draw(screen)
+        mus_btn.draw(screen)
+        mus_btn.reset()
         if skin1.click == False:
             skin1.reset1()
-        elif skin1.click == True:
+        elif skin1.click == True:      
             skin1.reset2()
-            skin2.click = False
-            skin3.click = False
-            skin4.click = False
         if skin2.click == False:
             skin2.reset1()
         elif skin2.click == True:
             skin2.reset2()
-            skin1.click = False
-            skin3.click = False
-            skin4.click = False
         if skin3.click == False:
             skin3.reset1()
         elif skin3.click == True:
             skin3.reset2()
-            skin1.click = False
-            skin2.click = False
-            skin4.click = False
         if skin4.click == False:
             skin4.reset1()
         elif skin4.click == True:
             skin4.reset2()
-            skin1.click = False
-            skin2.click = False
-            skin3.click = False
     elif a == "lvl1":
-        
         screen.blit(lvl1_bg, (x1, 0))
         screen.blit(lvl1_bg, (x2, 0))
-        
-        x1 -= bg_speed
-        x2 -= bg_speed
-
-        if x1 <= -WIDTH:
-            x1 = WIDTH
-
-        if x2 <= -WIDTH:
-            x2 = WIDTH
-        
-        end = t.time()
-        timer = int(end-start)
-
-        if timer >= 20:
-            bg_speed = 0
-            win = True
-            scroll = False
+        if not lose:
             
-            enemies.empty()
+            x1 -= bg_speed
+            x2 -= bg_speed
+
+            if x1 <= -WIDTH:
+                x1 = WIDTH
+
+            if x2 <= -WIDTH:
+                x2 = WIDTH
             
-            if player.rect.x < WIDTH:
-                player.rect.x += player.speed 
-            else:
-                run = False
+            end = t.time()
+            timer = int(end-start)
+
+            if timer >= 20:
+                bg_speed = 0
+                win = True
+                scroll = False
+                
+                enemies.empty()
+                
+                if player.rect.x < WIDTH:
+                    player.rect.x += player.speed 
+                else:
+                    run = False
+                
+            enemy_spawn_timer += clock.get_time()
+            if scroll and enemy_spawn_timer >= next_spawn:
+                enemy_spawn_timer = 0
+                next_spawn = random.randint(1000, 1500)
+                enemy = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/enemy.png")
+                enemies.add(enemy)
+
+            coin_spawn_timer += clock.get_time()
+            if scroll and coin_spawn_timer >= next_coin_spawn:
+                coin_spawn_timer = 0
+                next_coin_spawn = random.randint(3000, 5000)
+                coin = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/snitch.png", 3)
+                coins.add(coin)
             
-        enemy_spawn_timer += clock.get_time()
-        if scroll and enemy_spawn_timer >= next_spawn:
-            enemy_spawn_timer = 0
-            next_spawn = random.randint(1000, 1500)
-            enemy = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/enemy.png")
-            enemies.add(enemy)
-        
-        player.reset()
-        player.update()
-        bullets.draw(screen)
-        bullets.update()
-        enemies.draw(screen)
-        enemies.update()
-        
-        if sprite.groupcollide(bullets, enemies, True, True):
-            hit.play()
+            player.reset()
+            player.update()
+            bullets.draw(screen)
+            bullets.update()
+            enemies.draw(screen)
+            enemies.update()
+            coins.draw(screen)
+            coins.update()
+            
+            if sprite.groupcollide(bullets, enemies, True, True):
+                hit.play()
+            
+            if sprite.spritecollide(player, coins, True):
+                score += 1
+
+            if sprite.spritecollide(player, enemies, False):
+                lose = True
             
     clock.tick(90)
     display.update()
