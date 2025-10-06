@@ -25,22 +25,16 @@ class GameSprite(sprite.Sprite):
     def reset(self):
         screen.blit(self.image, (self.rect.x, self.rect.y))
         
-    # def click(self):
-    #     self.click = True
-        
     def reset2(self):
-    
-        # if self.click:
-        #     draw.rect(screen, YELLOW, self.rect, 5)
         draw.rect(screen, GREY, self.rect)
         screen.blit(self.image, (self.rect.x, self.rect.y))
+        click = False
             
     def reset3(self):
         draw.rect(screen, GREY, self.rect)
         draw.rect(screen, YELLOW, self.rect, 5)
         screen.blit(self.image, (self.rect.x, self.rect.y))
         
-click = False
 class Player(GameSprite):
     def update(self):
         if win == False:
@@ -67,9 +61,24 @@ class Enemy(GameSprite):
         if self.rect.x < 0:
             self.kill()
 
-# class Skin(GameSprite):       
-#     def update(self):
-#         draw.rect(screen, GREY, self.rect)
+class Skin():       
+    def __init__(self, x, y, width, height, im, click = False):
+        self.w = width
+        self.h = height
+        self.image = transform.scale(image.load(im), (self.w, self.h))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.click = click
+        
+    def reset1(self):
+        draw.rect(screen, GREY, self.rect)
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+            
+    def reset2(self):
+        draw.rect(screen, GREY, self.rect)
+        draw.rect(screen, YELLOW, self.rect, 5)
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
             
     
@@ -86,7 +95,10 @@ skins_btn = Button(20, HEIGHT-95, 200, 75, "images/blue_but.png", "sounds/click.
 
 player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
 
-skin1 = GameSprite(50, HEIGHT/2-150, 200, 200, "images/hero.png", 0)
+skin1 = Skin(50, HEIGHT/2-150, 200, 200, "images/player.png")
+skin2 = Skin(300, HEIGHT/2-150, 200, 200, "images/hero.png")
+skin3 = Skin(550, HEIGHT/2-150, 200, 200, "images/skin2.png")
+skin4 = Skin(800, HEIGHT/2-150, 200, 200, "images/skin3.png")
 
 mixer.init()
 mixer.music.load("sounds/menu.wav")
@@ -138,10 +150,14 @@ while run:
                     mixer.music.unpause()
                     music = "on"
             if skin1.rect.collidepoint(e.pos):
-                click = True
-                # skin1.click = False
-                # skin1.click()
-                        
+                skin1.click = True
+            if skin2.rect.collidepoint(e.pos):
+                skin2.click = True
+            if skin3.rect.collidepoint(e.pos):
+                skin3.click = True
+            if skin4.rect.collidepoint(e.pos):
+                skin4.click = True
+
     if a == "menu":
         screen.blit(menu_bg, (0, 0))
         start_btn.draw(screen)
@@ -157,10 +173,34 @@ while run:
         mus_btn.reset()
     elif a == "skins":
         screen.blit(menu_bg, (0, 0))
-        if click == False:
+        if skin1.click == False:
+            skin1.reset1()
+        elif skin1.click == True:
             skin1.reset2()
-        elif click == True:
-            skin1.reset3()
+            skin2.click = False
+            skin3.click = False
+            skin4.click = False
+        if skin2.click == False:
+            skin2.reset1()
+        elif skin2.click == True:
+            skin2.reset2()
+            skin1.click = False
+            skin3.click = False
+            skin4.click = False
+        if skin3.click == False:
+            skin3.reset1()
+        elif skin3.click == True:
+            skin3.reset2()
+            skin1.click = False
+            skin2.click = False
+            skin4.click = False
+        if skin4.click == False:
+            skin4.reset1()
+        elif skin4.click == True:
+            skin4.reset2()
+            skin1.click = False
+            skin2.click = False
+            skin3.click = False
     elif a == "lvl1":
         
         screen.blit(lvl1_bg, (x1, 0))
