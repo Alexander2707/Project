@@ -86,32 +86,32 @@ class Skin():
         draw.rect(screen, YELLOW, self.rect, 5)
         screen.blit(self.image, (self.rect.x, self.rect.y))
         
-def move_buttons():
-    global a
-    if a != "menu":
-        start_btn.rect.y = 10000
-        quit_btn.rect.y = 10000
-        lvl_btn.rect.y = 10000
-        help_btn.rect.y = 10000
-        skins_btn.rect.y = 10000
-    elif a != "lvl1" and lose == True:
-        restart_btn.rect.y = 10000
-        home_btn.rect.y = 10000
-        exit_btn.rect.y = 10000
-    elif a != "levels":
-        lvl1_btn.rect.y = 10000
-        lvl2_btn.rect.y = 10000
-    elif a == "skins":
-        start_btn.rect.y = 10000
-        quit_btn.rect.y = 10000
-        lvl_btn.rect.y = 10000
-        help_btn.rect.y = 10000
-        skins_btn.rect.y = 10000
-        restart_btn.rect.y = 10000
-        home_btn.rect.y = 10000
-        exit_btn.rect.y = 10000
-        lvl1_btn.rect.y = 10000
-        lvl2_btn.rect.y = 10000
+# def move_buttons():
+#     global a
+#     if a != "menu":
+#         start_btn.rect.y = 10000
+#         quit_btn.rect.y = 10000
+#         lvl_btn.rect.y = 10000
+#         help_btn.rect.y = 10000
+#         skins_btn.rect.y = 10000
+#     elif a != "lvl1" and lose == True:
+#         restart_btn.rect.y = 10000
+#         home_btn.rect.y = 10000
+#         exit_btn.rect.y = 10000
+#     elif a != "levels":
+#         lvl1_btn.rect.y = 10000
+#         lvl2_btn.rect.y = 10000
+#     elif a == "skins":
+#         start_btn.rect.y = 10000
+#         quit_btn.rect.y = 10000
+#         lvl_btn.rect.y = 10000
+#         help_btn.rect.y = 10000
+#         skins_btn.rect.y = 10000
+#         restart_btn.rect.y = 10000
+#         home_btn.rect.y = 10000
+#         exit_btn.rect.y = 10000
+#         lvl1_btn.rect.y = 10000
+#         lvl2_btn.rect.y = 10000
 
 def move_skins():
     skin1.rect.y = 10000
@@ -197,6 +197,17 @@ music = "on"
 a = "menu"
 run = True
 
+start_btn.rect.y = 10000
+quit_btn.rect.y = 10000
+lvl_btn.rect.y = 10000
+help_btn.rect.y = 10000
+skins_btn.rect.y = 10000
+restart_btn.rect.y = 10000
+home_btn.rect.y = 10000
+exit_btn.rect.y = 10000
+lvl1_btn.rect.y = 10000
+lvl2_btn.rect.y = 10000
+
 while run:   
     for e in event.get():
         if e.type == KEYDOWN:
@@ -206,9 +217,15 @@ while run:
                     player.fire()
         elif e.type == MOUSEBUTTONDOWN:
             if start_btn.rect.collidepoint(e.pos):
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
                 start_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
-                move_buttons()
                 move_skins()
                 menu_btn.rect.y = 10000
                 start = t.time()
@@ -216,31 +233,74 @@ while run:
                 quit_btn.check_click(mouse.get_pos(), e)
                 run = False
             if lvl_btn.rect.collidepoint(e.pos):
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                restart_btn.rect.y = 10000
+                home_btn.rect.y = 10000
+                exit_btn.rect.y = 10000
                 lvl_btn.check_click(mouse.get_pos(), e)
                 a = "levels"
-                move_buttons()
                 move_skins()
             if help_btn.rect.collidepoint(e.pos):
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                restart_btn.rect.y = 10000
+                home_btn.rect.y = 10000
+                exit_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
                 help_btn.check_click(mouse.get_pos(), e)
                 move_skins()
             if menu_btn.rect.collidepoint(e.pos):
                 menu_btn.check_click(mouse.get_pos(), e)
                 a = "menu"
                 move_skins()
+                restart_btn.rect.y = 10000
+                home_btn.rect.y = 10000
+                exit_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
             if skins_btn.rect.collidepoint(e.pos):
                 skins_btn.check_click(mouse.get_pos(), e)
                 a = "skins"
-                move_buttons()
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                restart_btn.rect.y = 10000
+                home_btn.rect.y = 10000
+                exit_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
             if lvl1_btn.rect.collidepoint(e.pos):
                 lvl1_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
                 start = t.time()
-                move_buttons()
             if lvl2_btn.rect.collidepoint(e.pos):
                 lvl2_btn.check_click(mouse.get_pos(), e)
                 a = "lvl2"
+                start_btn.rect.y = 10000
+                quit_btn.rect.y = 10000
+                lvl_btn.rect.y = 10000
+                help_btn.rect.y = 10000
+                skins_btn.rect.y = 10000
+                lvl1_btn.rect.y = 10000
+                lvl2_btn.rect.y = 10000
                 start = t.time()
-                move_buttons()
             if restart_btn.rect.collidepoint(e.pos):
                 restart_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
