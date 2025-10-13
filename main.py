@@ -85,33 +85,6 @@ class Skin():
         draw.rect(screen, GREY, self.rect)
         draw.rect(screen, YELLOW, self.rect, 5)
         screen.blit(self.image, (self.rect.x, self.rect.y))
-        
-# def move_buttons():
-#     global a
-#     if a != "menu":
-#         start_btn.rect.y = 10000
-#         quit_btn.rect.y = 10000
-#         lvl_btn.rect.y = 10000
-#         help_btn.rect.y = 10000
-#         skins_btn.rect.y = 10000
-#     elif a != "lvl1" and lose == True:
-#         restart_btn.rect.y = 10000
-#         home_btn.rect.y = 10000
-#         exit_btn.rect.y = 10000
-#     elif a != "levels":
-#         lvl1_btn.rect.y = 10000
-#         lvl2_btn.rect.y = 10000
-#     elif a == "skins":
-#         start_btn.rect.y = 10000
-#         quit_btn.rect.y = 10000
-#         lvl_btn.rect.y = 10000
-#         help_btn.rect.y = 10000
-#         skins_btn.rect.y = 10000
-#         restart_btn.rect.y = 10000
-#         home_btn.rect.y = 10000
-#         exit_btn.rect.y = 10000
-#         lvl1_btn.rect.y = 10000
-#         lvl2_btn.rect.y = 10000
 
 def move_skins():
     skin1.rect.y = 10000
@@ -131,6 +104,19 @@ def restart():
     next_spawn = random.randint(1000, 1500)
     win = False
     lose = False
+    
+def restart2():
+    global scroll, coin2_spawn_timer, enemy2_spawn_timer, next_coin_spawn2, next_spawn2, win, lose2, start
+    start = t.time()
+    enemies2.empty()
+    coins2.empty()
+    scroll = True
+    coin2_spawn_timer = 0
+    enemy2_spawn_timer = 0
+    next_coin_spawn2 = random.randint(3000, 5000)
+    next_spawn2 = random.randint(1000, 1500)
+    win = False
+    lose2 = False
 
             
     
@@ -152,6 +138,10 @@ lvl2_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+60), 200, 75, "images/red_but
 restart_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2), 200, 75, "images/btn1.png", "sounds/click.wav", "RESTART", "")
 home_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+90), 200, 75, "images/btn2.png", "sounds/click.wav", "MENU", "")
 exit_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+180), 200, 75, "images/btn3.png", "sounds/click.wav", "QUIT", "")
+
+restart2_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2), 200, 75, "images/btn1.png", "sounds/click.wav", "RESTART", "")
+home2_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+90), 200, 75, "images/btn2.png", "sounds/click.wav", "MENU", "")
+exit2_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+180), 200, 75, "images/btn3.png", "sounds/click.wav", "QUIT", "")
 
 player = Player(50, HEIGHT/2-150, 200, 200, "images/player.png", 5)
 
@@ -188,8 +178,10 @@ next_coin_spawn2 = random.randint(3000, 5000)
 next_spawn2 = random.randint(1000, 1500)
 lose2 = False
 
-font = font.Font(None, 48)
-lose_txt = font.render("YOU LOSE!", True, (255, 255, 255))
+txt_font = font.Font(None, 48)
+txt_font2 = font.Font(None, 96)
+lose_txt = txt_font.render("YOU LOSE!", True, (255, 255, 255))
+win_txt = txt_font2.render("YOU WIN!", True, (0, 0, 0))
 clock = time.Clock()
 x1 = 0
 x2 = WIDTH
@@ -197,16 +189,16 @@ music = "on"
 a = "menu"
 run = True
 
-start_btn.rect.y = 10000
-quit_btn.rect.y = 10000
-lvl_btn.rect.y = 10000
-help_btn.rect.y = 10000
-skins_btn.rect.y = 10000
-restart_btn.rect.y = 10000
-home_btn.rect.y = 10000
-exit_btn.rect.y = 10000
-lvl1_btn.rect.y = 10000
-lvl2_btn.rect.y = 10000
+# start_btn.rect.y = 10000
+# quit_btn.rect.y = 10000
+# lvl_btn.rect.y = 10000
+# help_btn.rect.y = 10000
+# skins_btn.rect.y = 10000
+# restart_btn.rect.y = 10000
+# home_btn.rect.y = 10000
+# exit_btn.rect.y = 10000
+# lvl1_btn.rect.y = 10000
+# lvl2_btn.rect.y = 10000
 
 while run:   
     for e in event.get():
@@ -217,94 +209,53 @@ while run:
                     player.fire()
         elif e.type == MOUSEBUTTONDOWN:
             if start_btn.rect.collidepoint(e.pos):
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
                 start_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
-                move_skins()
-                menu_btn.rect.y = 10000
                 start = t.time()
             if quit_btn.rect.collidepoint(e.pos):
                 quit_btn.check_click(mouse.get_pos(), e)
                 run = False
             if lvl_btn.rect.collidepoint(e.pos):
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                restart_btn.rect.y = 10000
-                home_btn.rect.y = 10000
-                exit_btn.rect.y = 10000
                 lvl_btn.check_click(mouse.get_pos(), e)
                 a = "levels"
-                move_skins()
             if help_btn.rect.collidepoint(e.pos):
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                restart_btn.rect.y = 10000
-                home_btn.rect.y = 10000
-                exit_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
                 help_btn.check_click(mouse.get_pos(), e)
-                move_skins()
             if menu_btn.rect.collidepoint(e.pos):
                 menu_btn.check_click(mouse.get_pos(), e)
                 a = "menu"
-                move_skins()
-                restart_btn.rect.y = 10000
-                home_btn.rect.y = 10000
-                exit_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
             if skins_btn.rect.collidepoint(e.pos):
                 skins_btn.check_click(mouse.get_pos(), e)
                 a = "skins"
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                restart_btn.rect.y = 10000
-                home_btn.rect.y = 10000
-                exit_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
             if lvl1_btn.rect.collidepoint(e.pos):
                 lvl1_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
                 start = t.time()
             if lvl2_btn.rect.collidepoint(e.pos):
                 lvl2_btn.check_click(mouse.get_pos(), e)
                 a = "lvl2"
-                start_btn.rect.y = 10000
-                quit_btn.rect.y = 10000
-                lvl_btn.rect.y = 10000
-                help_btn.rect.y = 10000
-                skins_btn.rect.y = 10000
-                lvl1_btn.rect.y = 10000
-                lvl2_btn.rect.y = 10000
                 start = t.time()
             if restart_btn.rect.collidepoint(e.pos):
                 restart_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
                 restart()
+            if home_btn.rect.collidepoint(e.pos):
+                home_btn.check_click(mouse.get_pos(), e)
+                a = "menu"
+                restart()
+            if exit_btn.rect.collidepoint(e.pos):
+                exit_btn.check_click(mouse.get_pos(), e)
+                run = False
+            if restart2_btn.rect.collidepoint(e.pos):
+                restart_btn.check_click(mouse.get_pos(), e)
+                a = "lvl2"
+                restart2()
+            if home2_btn.rect.collidepoint(e.pos):
+                home_btn.check_click(mouse.get_pos(), e)
+                a = "menu"
+                restart2()
+            if exit2_btn.rect.collidepoint(e.pos):
+                exit_btn.check_click(mouse.get_pos(), e)
+                run = False
             if mus_btn.rect.collidepoint(e.pos):
                 mus_btn.check_click(mouse.get_pos(), e)
                 if music == "on":
@@ -347,6 +298,19 @@ while run:
                 player = Player(50, HEIGHT/2-150, 200, 200, "images/skin3.png", 5)
 
     if a == "menu":
+        restart_btn.rect.y = 10000
+        home_btn.rect.y = 10000
+        exit_btn.rect.y = 10000
+        restart2_btn.rect.y = 10000
+        home2_btn.rect.y = 10000
+        exit2_btn.rect.y = 10000
+        lvl1_btn.rect.y = 10000
+        lvl2_btn.rect.y = 10000
+        start_btn.rect.y = (HEIGHT/2-100/2-60)
+        quit_btn.rect.y = (HEIGHT/2-100/2+60)
+        lvl_btn.rect.y = 20
+        help_btn.rect.y = 20
+        skins_btn.rect.y = HEIGHT-95
         screen.blit(menu_bg, (0, 0))
         start_btn.draw(screen)
         quit_btn.draw(screen)
@@ -364,7 +328,25 @@ while run:
         lvl_btn.rect.y = 20
         help_btn.rect.y = 20
         skins_btn.rect.y = HEIGHT-100
+        move_skins()
     elif a == "skins":
+        start_btn.rect.y = 10000
+        quit_btn.rect.y = 10000
+        lvl_btn.rect.y = 10000
+        help_btn.rect.y = 10000
+        skins_btn.rect.y = 10000
+        restart_btn.rect.y = 10000
+        home_btn.rect.y = 10000
+        exit_btn.rect.y = 10000
+        lvl1_btn.rect.y = 10000
+        lvl2_btn.rect.y = 10000
+        restart2_btn.rect.y = 10000
+        home2_btn.rect.y = 10000
+        exit2_btn.rect.y = 10000
+        skin1.rect.y = HEIGHT/2-150
+        skin2.rect.y = HEIGHT/2-150
+        skin3.rect.y = HEIGHT/2-150
+        skin4.rect.y = HEIGHT/2-150
         screen.blit(menu_bg, (0, 0))
         menu_btn.draw(screen)
         menu_btn.reset()
@@ -387,16 +369,43 @@ while run:
         elif skin4.click == True:
             skin4.reset2()
     elif a == "levels":
+        start_btn.rect.y = 10000
+        quit_btn.rect.y = 10000
+        lvl_btn.rect.y = 10000
+        help_btn.rect.y = 10000
+        skins_btn.rect.y = 10000
+        restart_btn.rect.y = 10000
+        home_btn.rect.y = 10000
+        exit_btn.rect.y = 10000
+        restart2_btn.rect.y = 10000
+        home2_btn.rect.y = 10000
+        exit2_btn.rect.y = 10000
+        lvl1_btn.rect.y = HEIGHT/2-100/2-60
+        lvl2_btn.rect.y = HEIGHT/2-100/2+60
         screen.blit(menu_bg, (0, 0))
         mus_btn.draw(screen)
         mus_btn.reset()
         menu_btn.draw(screen)
         lvl1_btn.draw(screen)
         lvl2_btn.draw(screen)
+        move_skins()
     elif a == "lvl1":
+        start_btn.rect.y = 10000
+        quit_btn.rect.y = 10000
+        lvl_btn.rect.y = 10000
+        help_btn.rect.y = 10000
+        skins_btn.rect.y = 10000
+        lvl1_btn.rect.y = 10000
+        lvl2_btn.rect.y = 10000
+        restart2_btn.rect.y = 10000
+        home2_btn.rect.y = 10000
+        exit2_btn.rect.y = 10000
+        move_skins()
         screen.blit(lvl1_bg, (x1, 0))
         screen.blit(lvl1_bg, (x2, 0))
         if not lose:
+            txt_score = txt_font.render(f'Score: {score}', True, (0,0,0))
+            screen.blit(txt_score, (20, HEIGHT-50))
             
             x1 -= bg_speed
             x2 -= bg_speed
@@ -414,13 +423,12 @@ while run:
                 bg_speed = 0
                 win = True
                 scroll = False
-                
                 enemies.empty()
-                
+                screen.blit(win_txt, (WIDTH/2-((96*4)/2), 200))
                 if player.rect.x < WIDTH:
                     player.rect.x += player.speed 
                 else:
-                    run = False
+                    a = "pause"
                 
             enemy_spawn_timer += clock.get_time()
             if scroll and enemy_spawn_timer >= next_spawn:
@@ -433,7 +441,7 @@ while run:
             if scroll and coin_spawn_timer >= next_coin_spawn:
                 coin_spawn_timer = 0
                 next_coin_spawn = random.randint(3000, 5000)
-                coin = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/snitch.png", 3)
+                coin = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 100, 100, "images/snitch.png", 3)
                 coins.add(coin)
             
             player.reset()
@@ -455,12 +463,26 @@ while run:
                 lose = True
                 
         elif lose == True:
+            restart_btn.rect.y = (HEIGHT/2-100/2)
+            exit_btn.rect.y = (HEIGHT/2-100/2+180)
+            home_btn.rect.y = (HEIGHT/2-100/2+90)
             draw.rect(screen, (47, 112, 175), (WIDTH/2 - 150, HEIGHT/2 - 250, 300, 500), 0, 20)
             restart_btn.draw(screen)
             home_btn.draw(screen)
             exit_btn.draw(screen)
             screen.blit(lose_txt, (WIDTH/2-85, HEIGHT/2 - 180))
     elif a == "lvl2":
+        start_btn.rect.y = 10000
+        quit_btn.rect.y = 10000
+        lvl_btn.rect.y = 10000
+        help_btn.rect.y = 10000
+        skins_btn.rect.y = 10000
+        lvl1_btn.rect.y = 10000
+        lvl2_btn.rect.y = 10000
+        restart_btn.rect.y = 10000
+        home_btn.rect.y = 10000
+        exit_btn.rect.y = 10000
+        move_skins()
         screen.blit(lvl2_bg, (x1, 0))
         screen.blit(lvl2_bg, (x2, 0))
         win = False
@@ -488,6 +510,7 @@ while run:
                 scroll = False
                 enemies2.empty()
                 
+                
                 if player.rect.x < WIDTH:
                     player.rect.x += player.speed 
                 else:
@@ -504,7 +527,7 @@ while run:
             if scroll and coin2_spawn_timer >= next_coin_spawn2:
                 coin2_spawn_timer = 0
                 next_coin_spawn2 = random.randint(3000, 5000)
-                coin2 = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 150, 150, "images/rock.png", 3)
+                coin2 = Enemy(WIDTH+10, random.randint(0, HEIGHT-200), 100, 100, "images/rock.png", 3)
                 coins2.add(coin2)
             
             player.reset()
@@ -524,6 +547,27 @@ while run:
 
             if sprite.spritecollide(player, enemies2, False):
                 lose2 = True
+        
+        elif lose2 == True:
+            restart2_btn.rect.y = (HEIGHT/2-100/2)
+            exit2_btn.rect.y = (HEIGHT/2-100/2+180)
+            home2_btn.rect.y = (HEIGHT/2-100/2+90)
+            draw.rect(screen, (47, 112, 175), (WIDTH/2 - 150, HEIGHT/2 - 250, 300, 500), 0, 20)
+            restart2_btn.draw(screen)
+            home2_btn.draw(screen)
+            exit2_btn.draw(screen)
+            screen.blit(lose_txt, (WIDTH/2-85, HEIGHT/2 - 180))
+    
+    elif a == "pause":
+        screen.blit(menu_bg, (0, 0))
+        mus_btn.draw(screen)
+        menu_btn.draw(screen)
+        lvl2_btn.draw(screen)
+        skins_btn.draw(screen)
+        menu_btn.rect.y = HEIGHT/2-100/2-45
+        menu_btn.rect.x = WIDTH/2-200/2
+        lvl2_btn.rect.y = HEIGHT/2-100/2+45
+        skins_btn.rect.y = HEIGHT-100
         
             
     clock.tick(90)
