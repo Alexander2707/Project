@@ -157,7 +157,7 @@ mixer.music.play(-1)
 hit = mixer.Sound('sounds/damage2.mp3')
 
 skins = []
-score = 0
+
 
 ########################### LEVEL 1 ###########################
 
@@ -169,6 +169,7 @@ next_spawn = random.randint(1000, 1500)
 win = False
 lose = False
 bg_speed = 2
+score = 0
 
 ########################### LEVEL 2 ###########################
 
@@ -177,7 +178,9 @@ enemy2_spawn_timer = 0
 next_coin_spawn2 = random.randint(3000, 5000)
 next_spawn2 = random.randint(1000, 1500)
 lose2 = False
+score2 = 0
 
+balance = 0
 txt_font = font.Font(None, 48)
 txt_font2 = font.Font(None, 96)
 lose_txt = txt_font.render("YOU LOSE!", True, (255, 255, 255))
@@ -188,17 +191,6 @@ x2 = WIDTH
 music = "on"
 a = "menu"
 run = True
-
-# start_btn.rect.y = 10000
-# quit_btn.rect.y = 10000
-# lvl_btn.rect.y = 10000
-# help_btn.rect.y = 10000
-# skins_btn.rect.y = 10000
-# restart_btn.rect.y = 10000
-# home_btn.rect.y = 10000
-# exit_btn.rect.y = 10000
-# lvl1_btn.rect.y = 10000
-# lvl2_btn.rect.y = 10000
 
 while run:   
     for e in event.get():
@@ -330,6 +322,8 @@ while run:
         skins_btn.rect.y = HEIGHT-100
         move_skins()
     elif a == "skins":
+        balance = score + score2
+        txt_balance = txt_font.render(f'Balance: {balance}', True, (255,255,255))
         start_btn.rect.y = 10000
         quit_btn.rect.y = 10000
         lvl_btn.rect.y = 10000
@@ -347,7 +341,10 @@ while run:
         skin2.rect.y = HEIGHT/2-150
         skin3.rect.y = HEIGHT/2-150
         skin4.rect.y = HEIGHT/2-150
+        menu_btn.rect.x = WIDTH-220
+        menu_btn.rect.y = 20
         screen.blit(menu_bg, (0, 0))
+        screen.blit(txt_balance, (20, HEIGHT-50))
         menu_btn.draw(screen)
         menu_btn.reset()
         mus_btn.draw(screen)
@@ -429,6 +426,11 @@ while run:
                     player.rect.x += player.speed 
                 else:
                     a = "pause"
+            else:
+                player.rect.x = 50
+                bg_speed = 2
+                win = False
+                scroll = True
                 
             enemy_spawn_timer += clock.get_time()
             if scroll and enemy_spawn_timer >= next_spawn:
@@ -491,6 +493,8 @@ while run:
         enemies.empty()
         bullets.empty()
         if not lose2:
+            txt_score2 = txt_font.render(f'Score: {score2}', True, (0,0,0))
+            screen.blit(txt_score2, (20, HEIGHT-50))
             
             x1 -= bg_speed
             x2 -= bg_speed
@@ -514,8 +518,12 @@ while run:
                 if player.rect.x < WIDTH:
                     player.rect.x += player.speed 
                 else:
-                    run = False
-                
+                    a = "menu"
+            else:
+                player.rect.x = 50    
+                bg_speed = 2
+                scroll = True
+            
             enemy2_spawn_timer += clock.get_time()
             if scroll and enemy2_spawn_timer >= next_spawn2:
                 enemy2_spawn_timer = 0
@@ -543,7 +551,7 @@ while run:
                 hit.play()
             
             if sprite.spritecollide(player, coins2, True):
-                score += 1
+                score2 += 1
 
             if sprite.spritecollide(player, enemies2, False):
                 lose2 = True
