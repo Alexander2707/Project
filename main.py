@@ -5,6 +5,7 @@ import random
 
 init()
 
+txt_font = font.Font(None, 48)
 YELLOW = (247, 244, 47)
 GREY = (104, 100, 97)
 
@@ -67,7 +68,7 @@ class Enemy(GameSprite):
             self.kill()
 
 class Skin():       
-    def __init__(self, x, y, width, height, im, click = False):
+    def __init__(self, x, y, width, height, im, click = False, active = False, price = 0):
         self.w = width
         self.h = height
         self.image = transform.scale(image.load(im), (self.w, self.h))
@@ -75,16 +76,42 @@ class Skin():
         self.rect.x = x
         self.rect.y = y
         self.click = click
+        self.active = active
+        self.price = price
         
+        self.price_txt = txt_font.render(f'price: {self.price}', True, (255, 255, 255))
+        self.button = Button(self.rect.x, self.rect.y+200, self.w, 50, "images/red_but.png", 'sounds/click.wav', "Buy")
     def reset1(self):
-
-        draw.rect(screen, GREY, self.rect)
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        
+        if self.active:
+            draw.rect(screen, GREY, self.rect)
+            screen.blit(self.image, (self.rect.x, self.rect.y))
+        else:
+            image2 = self.image.copy()
+            image2.fill((0, 0, 0, 150))
+            screen.blit(self.image, (self.rect.x, self.rect.y))
+            screen.blit(image2, (self.rect.x, self.rect.y))
+            draw.rect(screen, (0,0,0), self.rect, 5)
+            screen.blit(self.price_txt, (self.rect.x+10, self.rect.y+10)) 
+            self.button.draw(screen)
+            
             
     def reset2(self):
-        draw.rect(screen, GREY, self.rect)
-        draw.rect(screen, YELLOW, self.rect, 5)
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        if self.active:
+            draw.rect(screen, GREY, self.rect)
+            draw.rect(screen, YELLOW, self.rect, 5)
+            screen.blit(self.image, (self.rect.x, self.rect.y))
+        else:
+            image2 = self.image.copy()
+            image2.fill((0, 0, 0, 150))
+            screen.blit(self.image, (self.rect.x, self.rect.y))
+            screen.blit(image2, (self.rect.x, self.rect.y))
+            draw.rect(screen, (0,0,0), self.rect, 5)
+            screen.blit(self.price_txt, (self.rect.x+10, self.rect.y+10)) 
+            self.button.draw(screen)
+        
+    # def skin_locked(self):
+        
 
 def move_skins():
     skin1.rect.y = 10000
@@ -116,9 +143,7 @@ def restart2():
     next_coin_spawn2 = random.randint(3000, 5000)
     next_spawn2 = random.randint(1000, 1500)
     win = False
-    lose2 = False
-
-            
+    lose2 = False        
     
 screen = display.set_mode((0,0), FULLSCREEN)
 WIDTH, HEIGHT = screen.get_size()
@@ -145,10 +170,11 @@ exit2_btn = Button((WIDTH/2-200/2), (HEIGHT/2-100/2+180), 200, 75, "images/btn3.
 
 player = Player(50, HEIGHT/2-150, 200, 200, "images/player.png", 5)
 
-skin1 = Skin(50, HEIGHT/2-150, 200, 200, "images/player.png", True)
-skin2 = Skin(300, HEIGHT/2-150, 200, 200, "images/hero.png")
-skin3 = Skin(550, HEIGHT/2-150, 200, 200, "images/skin2.png")
-skin4 = Skin(800, HEIGHT/2-150, 200, 200, "images/skin3.png")
+skin1 = Skin(50, HEIGHT/2-150, 200, 200, "images/player.png", True, True)
+skin2 = Skin(300, HEIGHT/2-150, 200, 200, "images/hero.png", False, False, 5)
+skin3 = Skin(550, HEIGHT/2-150, 200, 200, "images/skin2.png", False, False, 10)
+
+skin4 = Skin(800, HEIGHT/2-150, 200, 200, "images/skin3.png", False, False, 15)
 
 mixer.init()
 mixer.music.load("sounds/menu.wav")
@@ -169,7 +195,7 @@ next_spawn = random.randint(1000, 1500)
 win = False
 lose = False
 bg_speed = 2
-score = 0
+score = 2
 
 ########################### LEVEL 2 ###########################
 
@@ -203,6 +229,7 @@ while run:
             if start_btn.rect.collidepoint(e.pos):
                 start_btn.check_click(mouse.get_pos(), e)
                 a = "lvl1"
+                restart()
                 start = t.time()
             if quit_btn.rect.collidepoint(e.pos):
                 quit_btn.check_click(mouse.get_pos(), e)
@@ -256,6 +283,18 @@ while run:
                 else:
                     mixer.music.unpause()
                     music = "on"
+            if skin4.button.rect.collidepoint(e.pos) and balance >= skin4.price:
+                    skin4.active = True
+                    balance -= skin4.price
+                    
+            if skin3.button.rect.collidepoint(e.pos) and balance >= skin3.price:
+                    skin3.active = True
+                    balance -= skin3.price
+                    
+            if skin2.button.rect.collidepoint(e.pos) and balance >= skin2.price:
+                    skin2.active = True
+                    balance -= skin2.price
+            
             if skin1.rect.collidepoint(e.pos):
                 skins.clear()
                 skins.append(skin1)
@@ -271,7 +310,8 @@ while run:
                 skin1.click = False
                 skin3.click = False
                 skin4.click = False
-                player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
+                if skin2.active:
+                    player = Player(50, HEIGHT/2-150, 200, 200, "images/hero.png", 5)
             if skin3.rect.collidepoint(e.pos):
                 skins.clear()
                 skins.append(skin3)
@@ -279,7 +319,8 @@ while run:
                 skin2.click = False
                 skin1.click = False
                 skin4.click = False
-                player = Player(50, HEIGHT/2-150, 200, 200, "images/skin2.png", 5)
+                if skin3.active:
+                    player = Player(50, HEIGHT/2-150, 200, 200, "images/skin2.png", 5)
             if skin4.rect.collidepoint(e.pos):
                 skins.clear()
                 skins.append(skin4)
@@ -287,9 +328,11 @@ while run:
                 skin2.click = False
                 skin3.click = False
                 skin1.click = False
-                player = Player(50, HEIGHT/2-150, 200, 200, "images/skin3.png", 5)
+                if skin4.active:
+                    player = Player(50, HEIGHT/2-150, 200, 200, "images/skin3.png", 5)
 
     if a == "menu":
+        a = "menu"
         restart_btn.rect.y = 10000
         home_btn.rect.y = 10000
         exit_btn.rect.y = 10000
@@ -298,6 +341,7 @@ while run:
         exit2_btn.rect.y = 10000
         lvl1_btn.rect.y = 10000
         lvl2_btn.rect.y = 10000
+        menu_btn.rect.y = 10000
         start_btn.rect.y = (HEIGHT/2-100/2-60)
         quit_btn.rect.y = (HEIGHT/2-100/2+60)
         lvl_btn.rect.y = 20
@@ -379,6 +423,8 @@ while run:
         exit2_btn.rect.y = 10000
         lvl1_btn.rect.y = HEIGHT/2-100/2-60
         lvl2_btn.rect.y = HEIGHT/2-100/2+60
+        menu_btn.rect.y = 20
+        menu_btn.rect.x = WIDTH-220
         screen.blit(menu_bg, (0, 0))
         mus_btn.draw(screen)
         mus_btn.reset()
