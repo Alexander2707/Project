@@ -3,6 +3,8 @@ from button import Button
 import time as t
 import random
 
+rules = transform.scale(image.load("images/rules.png"), (1000, 700))
+
 init()
 
 txt_font = font.Font(None, 48)
@@ -181,6 +183,7 @@ mixer.music.load("sounds/menu.wav")
 mixer.music.set_volume(0.4)
 mixer.music.play(-1)
 hit = mixer.Sound('sounds/damage2.mp3')
+coin_sound = mixer.Sound('sounds/coin.wav')
 
 skins = []
 
@@ -195,7 +198,8 @@ next_spawn = random.randint(1000, 1500)
 win = False
 lose = False
 bg_speed = 2
-score = 2
+# score = 0
+
 
 ########################### LEVEL 2 ###########################
 
@@ -204,7 +208,7 @@ enemy2_spawn_timer = 0
 next_coin_spawn2 = random.randint(3000, 5000)
 next_spawn2 = random.randint(1000, 1500)
 lose2 = False
-score2 = 0
+# score2 = 0
 
 balance = 0
 txt_font = font.Font(None, 48)
@@ -239,6 +243,7 @@ while run:
                 a = "levels"
             if help_btn.rect.collidepoint(e.pos):
                 help_btn.check_click(mouse.get_pos(), e)
+                a = "help"
             if menu_btn.rect.collidepoint(e.pos):
                 menu_btn.check_click(mouse.get_pos(), e)
                 a = "menu"
@@ -366,7 +371,6 @@ while run:
         skins_btn.rect.y = HEIGHT-100
         move_skins()
     elif a == "skins":
-        balance = score + score2
         txt_balance = txt_font.render(f'Balance: {balance}', True, (255,255,255))
         start_btn.rect.y = 10000
         quit_btn.rect.y = 10000
@@ -447,7 +451,7 @@ while run:
         screen.blit(lvl1_bg, (x1, 0))
         screen.blit(lvl1_bg, (x2, 0))
         if not lose:
-            txt_score = txt_font.render(f'Score: {score}', True, (0,0,0))
+            txt_score = txt_font.render(f'Balance: {balance}', True, (0,0,0))
             screen.blit(txt_score, (20, HEIGHT-50))
             
             x1 -= bg_speed
@@ -505,7 +509,8 @@ while run:
                 hit.play()
             
             if sprite.spritecollide(player, coins, True):
-                score += 1
+                balance += 1
+                coin_sound.play()
 
             if sprite.spritecollide(player, enemies, False):
                 lose = True
@@ -539,7 +544,7 @@ while run:
         enemies.empty()
         bullets.empty()
         if not lose2:
-            txt_score2 = txt_font.render(f'Score: {score2}', True, (0,0,0))
+            txt_score2 = txt_font.render(f'Balance: {balance}', True, (0,0,0))
             screen.blit(txt_score2, (20, HEIGHT-50))
             
             x1 -= bg_speed
@@ -558,6 +563,7 @@ while run:
                 bg_speed = 0
                 win = True
                 scroll = False
+                screen.blit(win_txt, (WIDTH/2-((96*4)/2), 200))
                 enemies2.empty()
                 
                 
@@ -597,11 +603,12 @@ while run:
                 hit.play()
             
             if sprite.spritecollide(player, coins2, True):
-                score2 += 1
+                balance += 1
+                coin_sound.play()
 
             if sprite.spritecollide(player, enemies2, False):
                 lose2 = True
-        
+                
         elif lose2 == True:
             restart2_btn.rect.y = (HEIGHT/2-100/2)
             exit2_btn.rect.y = (HEIGHT/2-100/2+180)
@@ -622,6 +629,13 @@ while run:
         menu_btn.rect.x = WIDTH/2-200/2
         lvl2_btn.rect.y = HEIGHT/2-100/2+45
         skins_btn.rect.y = HEIGHT-100
+        
+    elif a == "help":
+        screen.blit(menu_bg, (0,0))
+        screen.blit(rules, (200, 25))
+        menu_btn.rect.x = WIDTH-220
+        menu_btn.rect.y = 20
+        menu_btn.draw(screen)
         
             
     clock.tick(90)
